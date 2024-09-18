@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Dimensionamento</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #007bff;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .input-group input {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .result-group {
+            background-color: #e9f4ff;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .result-group p {
+            font-size: 18px;
+            margin: 5px 0;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculadora de Dimensionamento</h1>
+        <div class="input-group">
+            <label for="avaliados">Número de Avaliados:</label>
+            <input type="number" id="avaliados" placeholder="Insira o número de avaliados">
+        </div>
+        <div class="input-group">
+            <label for="avaliadores">Número de Avaliadores:</label>
+            <input type="number" id="avaliadores" placeholder="Insira o número de avaliadores">
+        </div>
+        <div class="input-group">
+            <label for="amostras">Amostras por Avaliado:</label>
+            <input type="number" id="amostras" placeholder="Insira o número de amostras">
+        </div>
+        <div class="input-group">
+            <label for="tempo">Tempo de Avaliação (min):</label>
+            <input type="number" id="tempo" placeholder="Insira o tempo de avaliação em minutos">
+        </div>
+        <div class="button-container">
+            <button onclick="calcular()">Calcular</button>
+            <button onclick="compartilhar()">Compartilhar Resultado</button>
+        </div>
+        <div class="result-group" id="resultados">
+            <p>Total de Amostras: <span id="totalAmostras">0</span></p>
+            <p>Amostras por Avaliador: <span id="amostrasPorAvaliador">0</span></p>
+            <p>Tempo Total: <span id="tempoTotal">0</span> minutos</p>
+            <p>Tempo Total em Horas: <span id="tempoTotalHoras">0</span> horas</p>
+            <p>Horas por Dia: <span id="horasDia">0</span></p>
+            <p>Horas Dia por Avaliador: <span id="horasDiaPorAvaliador">0</span></p>
+            <p>Horas por Mês: <span id="horasMes">0</span></p>
+            <p>Horas Semanais: <span id="horasSemana">0</span></p>
+            <p>Horas Semanais por Avaliador: <span id="horasSemanaPorAvaliador">0</span></p>
+            <p>Avaliações por Dia: <span id="avaliacoesDia">0</span></p>
+            <p>Avaliações por Dia por Avaliador: <span id="avaliacoesDiaPorAvaliador">0</span></p>
+            <p>Margem de Erro: <span id="margemErro">0</span>%</p>
+            <p>Avaliados por Avaliador: <span id="avaliadosPorAvaliador">0</span></p>
+        </div>
+    </div>
+
+    <script>
+        function calcular() {
+            const avaliados = parseInt(document.getElementById('avaliados').value);
+            const avaliadores = parseInt(document.getElementById('avaliadores').value);
+            const amostras = parseInt(document.getElementById('amostras').value);
+            const tempo = parseInt(document.getElementById('tempo').value);
+
+            if (isNaN(avaliados) || isNaN(avaliadores) || isNaN(amostras) || isNaN(tempo)) {
+                alert('Por favor, preencha todos os campos corretamente.');
+                return;
+            }
+
+            const totalAmostras = avaliados * amostras;
+            const amostrasPorAvaliador = totalAmostras / avaliadores;
+            const tempoTotal = tempo * totalAmostras; // Tempo Total em minutos
+            const tempoTotalHoras = (tempoTotal / 60).toFixed(2); // Convertendo para horas
+            const diasUteis = 4 * 5; // Considerando 4 semanas e 5 dias úteis por semana
+            const horasDia = (tempoTotalHoras / diasUteis).toFixed(2); // Horas por dia
+            const horasDiaPorAvaliador = (horasDia / avaliadores).toFixed(2); // Horas por dia por avaliador
+            const horasMes = (tempoTotalHoras / 1).toFixed(2); // Tempo Total em horas por mês (ajustado)
+            const horasSemana = (horasMes / 4).toFixed(2); // Dividindo por 4 semanas
+            const horasSemanaPorAvaliador = (horasSemana / avaliadores).toFixed(2); // Ajustado
+            const avaliacoesDia = (totalAmostras / diasUteis).toFixed(2); // Avaliações por dia
+            const avaliacoesDiaPorAvaliador = (amostrasPorAvaliador / diasUteis).toFixed(2); // Avaliações por dia por avaliador
+            const margemErro = ((1 / Math.sqrt(totalAmostras)) * 100).toFixed(2);
+            const avaliadosPorAvaliador = (avaliados / avaliadores).toFixed(2);
+
+            document.getElementById('totalAmostras').textContent = totalAmostras;
+            document.getElementById('amostrasPorAvaliador').textContent = amostrasPorAvaliador;
+            document.getElementById('tempoTotal').textContent = tempoTotal;
+            document.getElementById('tempoTotalHoras').textContent = tempoTotalHoras;
+            document.getElementById('horasDia').textContent = horasDia;
+            document.getElementById('horasDiaPorAvaliador').textContent = horasDiaPorAvaliador;
+            document.getElementById('horasMes').textContent = horasMes;
+            document.getElementById('horasSemana').textContent = horasSemana;
+            document.getElementById('horasSemanaPorAvaliador').textContent = horasSemanaPorAvaliador;
+            document.getElementById('avaliacoesDia').textContent = avaliacoesDia;
+            document.getElementById('avaliacoesDiaPorAvaliador').textContent = avaliacoesDiaPorAvaliador;
+            document.getElementById('margemErro').textContent = margemErro;
+            document.getElementById('avaliadosPorAvaliador').textContent = avaliadosPorAvaliador;
+        }
+
+        function compartilhar() {
+            const totalAmostras = document.getElementById('totalAmostras').textContent;
+            const amostrasPorAvaliador = document.getElementById('amostrasPorAvaliador').textContent;
+            const tempoTotal = document.getElementById('tempoTotal').textContent;
+            const tempoTotalHoras = document.getElementById('tempoTotalHoras').textContent;
+            const horasDia = document.getElementById('horasDia').textContent;
+            const horasDiaPorAvaliador = document.getElementById('horasDiaPorAvaliador').textContent;
+            const horasMes = document.getElementById('horasMes').textContent;
+            const horasSemana = document.getElementById('horasSemana').textContent;
+            const horasSemanaPorAvaliador = document.getElementById('horasSemanaPorAvaliador').textContent;
+            const avaliacoesDia = document.getElementById('avaliacoesDia').textContent;
+            const avaliacoesDiaPorAvaliador = document.getElementById('avaliacoesDiaPorAvaliador').textContent;
+            const margemErro = document.getElementById('margemErro').textContent;
+            const avaliadosPorAvaliador = document.getElementById('avaliadosPorAvaliador').textContent;
+
+            const mensagem = `Resultados da Calculadora de Dimensionamento:\n\n` +
+                `- Total de Amostras: ${totalAmostras}\n` +
+                `- Amostras por Avaliador: ${amostrasPorAvaliador}\n` +
+                `- Tempo Total: ${tempoTotal} minutos\n` +
+                `- Tempo Total em Horas: ${tempoTotalHoras}\n` +
+                `- Horas por Dia: ${horasDia}\n` +
+                `- Horas Dia por Avaliador: ${horasDiaPorAvaliador}\n` +
+                `- Horas por Mês: ${horasMes}\n` +
+                `- Horas Semanais: ${horasSemana}\n` +
+                `- Horas Semanais por Avaliador: ${horasSemanaPorAvaliador}\n` +
+                `- Avaliações por Dia: ${avaliacoesDia}\n` +
+                `- Avaliações por Dia por Avaliador: ${avaliacoesDiaPorAvaliador}\n` +
+                `- Margem de Erro: ${margemErro}%\n` +
+                `- Avaliados por Avaliador: ${avaliadosPorAvaliador}`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Resultados da Calculadora de Dimensionamento',
+                    text: mensagem,
+                }).then(() => {
+                    console.log('Compartilhamento bem-sucedido');
+                }).catch((error) => {
+                    console.error('Erro ao compartilhar:', error);
+                });
+            } else {
+                alert('Compartilhamento não disponível neste navegador.');
+            }
+        }
+    </script>
+</body>
+</html>
